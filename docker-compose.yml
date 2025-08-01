@@ -1,0 +1,24 @@
+version: '3.8'
+services:
+  backend:
+    build: ./backend
+    volumes:
+      - ./db:/app/db
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    ports:
+      - "8000:8000"
+    depends_on: []
+    networks:
+      - nivii-net
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - nivii-net
+networks:
+  nivii-net:
+    driver: bridge
