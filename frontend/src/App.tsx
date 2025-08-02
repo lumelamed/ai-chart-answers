@@ -1,10 +1,10 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
-import { ThemeProvider } from '@/components/theme-provider';
+import { ThemeProvider } from '@/components/ThemeProvider';
 import axios from 'axios';
 import ChartOrFallback from './components/ChartOrFallback';
-import { Button } from '@/components/ui/button';
-import { Input } from './components/ui/input';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from './components/ui/select';
+import { Button } from '@/components/ui/Button';
+import { Input } from './components/ui/Input';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from './components/ui/Select';
 
 type ChartType = 'bar' | 'line' | 'pie';
 

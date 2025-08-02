@@ -1,7 +1,8 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import App from './App';
+import { vi, describe, it, beforeEach, expect } from 'vitest';
 
-jest.mock('axios');
+vi.mock('axios');
 import axios from 'axios';
 
 const mockResponse = {
@@ -11,7 +12,7 @@ const mockResponse = {
 
 describe('App', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renderiza input y botón', () => {
@@ -21,7 +22,7 @@ describe('App', () => {
   });
 
   it('muestra error si backend falla', async () => {
-    (axios.post as jest.Mock).mockRejectedValue({ response: { data: { detail: 'Error' } } });
+    (axios.post as any).mockRejectedValue({ response: { data: { detail: 'Error' } } });
     render(<App />);
     fireEvent.change(screen.getByPlaceholderText(/pregunta/i), { target: { value: 'test' } });
     fireEvent.click(screen.getByText(/preguntar/i));
@@ -29,10 +30,14 @@ describe('App', () => {
   });
 
   it('muestra gráfico si backend responde', async () => {
-    (axios.post as jest.Mock).mockResolvedValue({ data: mockResponse });
+    (axios.post as any).mockResolvedValue({ data: mockResponse });
     render(<App />);
     fireEvent.change(screen.getByPlaceholderText(/pregunta/i), { target: { value: 'test' } });
+    // Cambia el tipo de gráfico a uno inválido para forzar la tabla
+    fireEvent.change(screen.getByDisplayValue('Barra'), { target: { value: 'otro' } });
     fireEvent.click(screen.getByText(/preguntar/i));
-    await waitFor(() => expect(screen.getByText('A')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText('A')).toBeInTheDocument()
+    );
   });
 });

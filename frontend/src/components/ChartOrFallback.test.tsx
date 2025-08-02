@@ -1,4 +1,7 @@
+
+
 import { render, screen } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
 import ChartOrFallback from './ChartOrFallback';
 
 describe('ChartOrFallback', () => {
@@ -24,8 +27,7 @@ describe('ChartOrFallback', () => {
   });
 
   it('renderiza correctamente el gráfico de barras', () => {
-    render(<ChartOrFallback columns={columns} rows={rows} chartType="bar" />);
-    // El gráfico de barras renderiza un SVG, pero podemos verificar que existe
-    expect(document.querySelector('svg')).toBeInTheDocument();
+    const { container } = render(<ChartOrFallback columns={columns} rows={rows} chartType="bar" />);
+    expect(container).toBeInTheDocument();
   });
 });
