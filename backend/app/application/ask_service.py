@@ -1,6 +1,9 @@
 from app.domain.entities import Question, QueryResult
 from app.application.ask_question_use_case import AskQuestionUseCase
 from app.application.load_csv_use_case import LoadCSVUseCase
+from app.infrastructure.db_repository import DBRepository
+from app.infrastructure.openai_client import OpenAIClient
+from app.webapi.config import DB_PATH
 
 class AskService:
     def __init__(self, openai_client, db_repo):
@@ -12,3 +15,7 @@ class AskService:
 
     def load_csv(self, csv_path: str, table_name: str = "data"):
         return self.load_csv_use_case.execute(csv_path, table_name)
+    
+db_repo = DBRepository(DB_PATH)
+openai_client = OpenAIClient()
+ask_service = AskService(openai_client, db_repo)

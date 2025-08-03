@@ -1,17 +1,17 @@
 import os
-import openai
-import backoff
 import logging
 import traceback
-from openai import RateLimitError, APIError, Timeout
+import backoff
+from openai import AsyncOpenAI, RateLimitError, APIError, Timeout
 
 logger = logging.getLogger(__name__)
 
 class OpenAIClient:
     def __init__(self):
-        openai.api_key = os.getenv("OPENAI_API_KEY")
-        if not openai.api_key:
+        api_key = os.environ.get("OPENAI_API_KEY")
+        if not api_key:
             logger.warning("⚠️ OPENAI_API_KEY is not configured.")
+        self.client = AsyncOpenAI(api_key=api_key)
 
     @backoff.on_exception(
         backoff.expo,
@@ -19,28 +19,25 @@ class OpenAIClient:
         max_tries=3,
         jitter=backoff.full_jitter,
         on_backoff=lambda details: logger.warning(
-            f"Retrying OpenAI (trying {details['tries']}) due to: {details['exception']}"
+            f"Retrying OpenAI (try {details['tries']}) due to: {details['exception']}"
         )
     )
     async def question_to_sql(self, question: str) -> str:
         prompt = f"Translate the following question into a valid SQL query for the database: '{question}'"
-        
+
         try:
-            response = await openai.ChatCompletion.acreate(
-                model="gpt-4",
-                messages=[
-                    {"role": "system", "content": "Answer clearly and helpfully."},
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.0,
+            response = await self.client.responses.create(
+                model="gpt-4o",
+                instructions="Answer clearly and helpfully.",
+                input=prompt,
             )
-            sql = response.choices[0].message.content.strip()
+            sql = response.output_text
             logger.debug(f"✅ OpenAI replied: {sql}")
             return sql
-        
+
         except (RateLimitError, APIError, Timeout) as e:
             logger.error(f"❌ OpenAI error: {type(e).__name__} - {e}")
-            raise  # se vuelve a lanzar para que backoff funcione
+            raise
 
         except Exception as e:
             logger.error("❌ Unexpected error when calling OpenAI:")

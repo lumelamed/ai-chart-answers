@@ -1,4 +1,4 @@
-from app.application import ask_service as default_ask_service
+from app.application.ask_service import ask_service as default_ask_service
 from app.domain.entities import Question
 from app.webapi.config import DB_PATH
 from app.webapi.schemas import AskRequest, AskResponse, UploadCSVResponse

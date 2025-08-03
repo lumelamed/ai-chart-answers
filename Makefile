@@ -1,7 +1,7 @@
 # Detecta entorno operativo
 ifeq ($(OS),Windows_NT)
-    PYTHON=venv\Scripts\python.exe
-    PIP=venv\Scripts\pip.exe
+    PYTHON=venv/Scripts/python.exe
+    PIP=venv/Scripts/pip.exe
 else
     PYTHON=venv/bin/python
     PIP=venv/bin/pip
