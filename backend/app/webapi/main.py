@@ -31,19 +31,3 @@ app.add_middleware(
 )
 
 app.include_router(router)
-
-# MOCK para desarrollo: simula respuestas del backend si MOCK_BACKEND=1
-import os
-if os.environ.get("MOCK_BACKEND") == "1":
-    from app.webapi import routes
-
-    class DummyAskService:
-        async def ask(self, question):
-            class R:
-                columns = ["col1", "col2"]
-                rows = [[1, 2], [3, 4]]
-            return R()
-        def load_csv(self, csv_path, table_name="data"):
-            pass
-
-    app.dependency_overrides[routes.get_ask_service] = lambda: DummyAskService()

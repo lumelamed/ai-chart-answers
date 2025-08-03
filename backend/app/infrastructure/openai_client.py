@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 class OpenAIClient:
     def __init__(self):
-        api_key = os.environ.get("OPENAI_API_KEY")
+        api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:
             logger.warning("⚠️ OPENAI_API_KEY is not configured.")
         self.client = AsyncOpenAI(api_key=api_key)

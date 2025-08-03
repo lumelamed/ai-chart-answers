@@ -1,3 +1,4 @@
+import os
 from app.application.ask_service import ask_service as default_ask_service
 from app.domain.entities import Question
 from app.webapi.config import DB_PATH
@@ -6,8 +7,19 @@ from fastapi import Depends, APIRouter, UploadFile, File, HTTPException
 
 router = APIRouter()
 
+# MOCK para desarrollo: simula respuestas del backend si MOCK_BACKEND=1
+class DummyAskService:
+    async def ask(self, question):
+        class R:
+            columns = ["col1", "col2"]
+            rows = [[1, 2], [3, 4]]
+        return R()
+    def load_csv(self, csv_path, table_name="data"):
+        pass
+
 def get_ask_service():
-    return default_ask_service
+    print("EL BACK ESTA MOCKEADO" if os.environ.get("MOCK_BACKEND") == "1" else "BACKEND LEVANTADO")
+    return DummyAskService() if os.environ.get("MOCK_BACKEND") == "1" else default_ask_service
 
 @router.post("/ask", response_model=AskResponse)
 async def ask(request: AskRequest, ask_service=Depends(get_ask_service)):
