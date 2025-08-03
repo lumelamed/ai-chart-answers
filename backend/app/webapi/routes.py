@@ -25,7 +25,7 @@ def get_ask_service():
 async def ask(request: AskRequest, ask_service=Depends(get_ask_service)):
     try: 
         if not request.question:
-            raise HTTPException(status_code=422, detail="La pregunta no puede estar vacía")
+            raise HTTPException(status_code=422, detail="Question must be populated")
         result = await ask_service.ask(Question(question=request.question))
         # Fallback: si no hay columnas o filas, o si los datos no son graficables
         if not result.columns or not result.rows:
@@ -46,4 +46,4 @@ async def upload_csv(file: UploadFile = File(...), ask_service=Depends(get_ask_s
         ask_service.load_csv(file_path)
         return UploadCSVResponse(message="CSV loaded successfully")
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))

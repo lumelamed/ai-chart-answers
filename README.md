@@ -30,8 +30,23 @@ App fullstack para consulta de datos en lenguaje natural sobre un CSV, usando Fa
 
 ## Escalabilidad
 
-- **Usuarios**: Añadir autenticación (JWT), rate limiting, workers asíncronos.
-- **Datos grandes**: Migrar a PostgreSQL, paginación, caché, colas de tareas.
+#### 🔐 Multiusuario
+- Añadir autenticación con JWT y control de sesión.
+- Limitar la frecuencia de consultas por usuario (rate limiting con Redis o FastAPI-Limiter).
+- Implementar colas asíncronas (ej. Celery + Redis) para desacoplar consultas a OpenAI, evitando bloquear la UI en solicitudes lentas.
+- Guardar historial por usuario para auditoría y reutilización de consultas.
+
+#### 🧠 Datos grandes / alta demanda
+- Migrar a PostgreSQL u otra base SQL escalable.
+- Aplicar paginación en resultados extensos para evitar transferencias pesadas.
+- Usar caché inteligente (Redis o similar) para consultas repetidas o resultados intermedios.
+- Validar y sanitizar SQL generado por LLMs antes de ejecutarlo, especialmente si los datasets crecen en volumen y relaciones.
+- Separar los procesos en microservicios si el volumen crece: uno para el modelado LLM, otro para ejecución SQL, otro para visualización.
+
+#### 🧰 DevOps
+- Desplegar con Gunicorn + Uvicorn workers para mejorar concurrencia.
+- Escalar horizontalmente con Kubernetes o servicios gestionados como AWS ECS.
+
 
 ## Clean Architecture
 
