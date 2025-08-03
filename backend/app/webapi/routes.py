@@ -1,7 +1,7 @@
-from backend.app.application import ask_service as default_ask_service
-from backend.app.domain.entities import Question
+from app.application import ask_service as default_ask_service
+from app.domain.entities import Question
 from app.webapi.config import DB_PATH
-from backend.app.webapi.schemas import AskRequest, AskResponse, UploadCSVResponse
+from app.webapi.schemas import AskRequest, AskResponse, UploadCSVResponse
 from fastapi import Depends, APIRouter, UploadFile, File, HTTPException
 
 router = APIRouter()
