@@ -10,8 +10,9 @@ class DummyDB:
     def execute_sql(self, sql):
         return ["a", "b"], [[1, 2]]
 
-def test_ask_service(monkeypatch):
+@pytest.mark.asyncio
+async def test_ask_service(monkeypatch):
     service = AskService(DummyOpenAI(), DummyDB())
-    result = pytest.run(service.ask(Question("How many records are there?")))
+    result = await service.ask(Question(question="How many records are there?"))
     assert result.columns == ["a", "b"]
     assert result.rows == [[1, 2]]

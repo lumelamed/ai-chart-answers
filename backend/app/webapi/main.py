@@ -5,6 +5,7 @@ from app.infrastructure.db_repository import DBRepository
 from app.infrastructure.openai_client import OpenAIClient
 from app.application.ask_service import AskService
 from app.webapi.routes import router
+from app.webapi.config import DB_PATH
 import sqlite3
 import logging
 
@@ -13,7 +14,6 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
 )
 
-DB_PATH = os.getenv("DB_PATH", "db/data.db")
 
 # Inicializa la base de datos si no existe
 os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
