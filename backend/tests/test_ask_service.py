@@ -12,6 +12,6 @@ class DummyDB:
 
 def test_ask_service(monkeypatch):
     service = AskService(DummyOpenAI(), DummyDB())
-    result = pytest.run(service.ask(Question("¿Cuántos registros hay?")))
+    result = pytest.run(service.ask(Question("How many records are there?")))
     assert result.columns == ["a", "b"]
     assert result.rows == [[1, 2]]

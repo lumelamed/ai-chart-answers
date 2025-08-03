@@ -5,16 +5,22 @@ services:
     volumes:
       - ./db:/app/db
     environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
     ports:
       - "8000:8000"
     depends_on: []
     networks:
       - nivii-net
+
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        NODE_ENV: ${NODE_ENV}
     ports:
       - "5173:5173"
+    environment:
+      NODE_ENV: ${NODE_ENV}
     depends_on:
       - backend
     networks:

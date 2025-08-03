@@ -9,3 +9,5 @@ httpx
 backoff
 pytest
 pytest-asyncio
+python-multipart
+debugpy

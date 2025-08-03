@@ -11,6 +11,6 @@ class AskQuestionUseCase:
     async def execute(self, question: Question) -> QueryResult:
         sql = await self.openai_client.question_to_sql(question.text)
         if not is_safe_sql(sql):
-            raise ValueError("Consulta SQL potencialmente insegura")
+            raise ValueError("Potentially unsafe SQL query")
         columns, rows = self.db_repo.execute_sql(sql)
         return QueryResult(columns, rows)
