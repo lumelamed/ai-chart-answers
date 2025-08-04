@@ -71,7 +71,7 @@ export default function App() {
 
             <div className="flex items-center mb-4 gap-2">
               <h1 className="text-2xl font-bold">Mini</h1>
-              <img src="/nivi-logo.png" alt="nivi logo" className="h-8 w-8 object-contain" />
+              <img src="/nivii-logo.png" alt="nivi logo" className="h-8 w-8 object-contain" />
             </div>
 
             <Input type="file" accept=".csv" onChange={handleUpload} className="mb-4 w-72" />
@@ -123,8 +123,25 @@ export default function App() {
             )}
             {data && (
               <>
-                <ChartOrFallback columns={data.columns} rows={data.rows} chartType={chartType} />
-                <ExplanationStream columns={data.columns} rows={data.rows} />
+                {data.columns?.length >=2 && data.rows?.length > 0 ? (
+                  <>
+                    <ChartOrFallback
+                      columns={data.columns}
+                      rows={data.rows}
+                      chartType={chartType}
+                    />
+                    <ExplanationStream
+                      columns={data.columns}
+                      rows={data.rows}
+                    />
+                  </>
+                ) : (
+                  <ChartOrFallback
+                    columns={data.columns}
+                    rows={data.rows}
+                    chartType={chartType}
+                  />
+                )}
               </>
             )}
           </div>

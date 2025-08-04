@@ -19,11 +19,19 @@ export const uploadCSV = async (file: File): Promise<void> => {
 };
 
 export const explainResult = async (columns: string[], rows: (string | number)[][]): Promise<ReadableStreamDefaultReader<Uint8Array>> => {
-  const res = await fetch('/explain', {
+const res = await fetch('/explain', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ columns, rows }),
   });
-  if (!res.body) throw new Error('No response body');
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Error ${res.status}: ${errorText}`);
+  }
+
+  if (!res.body) {
+    throw new Error('No response body');
+  }
   return res.body.getReader();
 };

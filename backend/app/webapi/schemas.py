@@ -10,3 +10,7 @@ class AskResponse(BaseModel):
 
 class UploadCSVResponse(BaseModel):
     message: str
+
+class ExplainRequest(BaseModel):
+    columns: List[str]
+    rows: List[List[Any]]

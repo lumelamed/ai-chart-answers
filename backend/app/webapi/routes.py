@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from fastapi.responses import StreamingResponse
 from app.domain.entities import Question, QueryResult
 from app.webapi.config import DB_PATH
-from app.webapi.schemas import AskRequest, AskResponse, UploadCSVResponse
+from app.webapi.schemas import AskRequest, AskResponse, ExplainRequest, UploadCSVResponse
 from app.application.ask_question_use_case import AskQuestionUseCase
 from app.application.load_csv_use_case import LoadCSVUseCase
 from app.application.explain_result_use_case import ExplainResultUseCase
@@ -62,18 +62,18 @@ async def ask(
         if len(result.columns) > 20:
             return AskResponse(columns=result.columns[:20], rows=[row[:20] for row in result.rows])
         return AskResponse(columns=result.columns, rows=result.rows)
-    except RuntimeError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except ValueError as ve:
+        raise HTTPException(status_code=500, detail=str(ve))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/explain")
 async def explain(
-    data: dict,
+    data: ExplainRequest,
     use_case: ExplainResultUseCase = Depends(get_explain_result_use_case),
 ):
-    columns = data.get("columns", [])
-    rows = data.get("rows", [])
+    columns = data.columns
+    rows = data.rows
     return StreamingResponse(use_case.execute(columns, rows), media_type="text/plain")
 
 @router.post("/upload_csv", response_model=UploadCSVResponse)

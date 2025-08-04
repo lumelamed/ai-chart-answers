@@ -1,10 +1,12 @@
 import os
-import logging
 import traceback
+from app.infrastructure.sql_helper import clean_sql_output
 import backoff
-from openai import AsyncOpenAI, RateLimitError, APIError, Timeout
+from openai import AsyncOpenAI, OpenAIError
+import logging
 
 logger = logging.getLogger(__name__)
+
 
 class OpenAIClient:
     def __init__(self):
@@ -15,15 +17,15 @@ class OpenAIClient:
 
     @backoff.on_exception(
         backoff.expo,
-        (RateLimitError, APIError, Timeout),
+        (OpenAIError),
         max_tries=3,
         jitter=backoff.full_jitter,
         on_backoff=lambda details: logger.warning(
             f"Retrying OpenAI (try {details['tries']}) due to: {details['exception']}"
         )
     )
-    async def question_to_sql(self, question: str) -> str:
-        prompt = f"Translate the following question into a valid SQL query for the database: '{question}'"
+    async def question_to_sql(self, question: str, schema: str) -> str:
+        prompt = self.build_prompt(question, schema)
 
         try:
             response = await self.client.responses.create(
@@ -31,11 +33,12 @@ class OpenAIClient:
                 instructions="Answer clearly and helpfully.",
                 input=prompt,
             )
-            sql = response.output_text
-            logger.debug(f"✅ OpenAI replied: {sql}")
+            sql_raw = response.output_text
+            logger.info(f"✅ OpenAI replied: {sql_raw}")
+            sql = clean_sql_output(sql_raw)
             return sql
 
-        except (RateLimitError, APIError, Timeout) as e:
+        except (OpenAIError) as e:
             logger.error(f"❌ OpenAI error: {type(e).__name__} - {e}")
             raise
 
@@ -43,10 +46,19 @@ class OpenAIClient:
             logger.error("❌ Unexpected error when calling OpenAI:")
             logger.error(traceback.format_exc())
             raise Exception("Unexpected failure when communicating with OpenAI") from e
+    
+    @staticmethod
+    def build_prompt(question: str, schema: str) -> str:
+        return (
+            "You are a helpful assistant that converts natural language into SQL for a SQLite database.\n"
+            "Only output the SQL query, without explanation or preamble.\n"
+            f"The database schema is as follows:\n{schema}\n\n"
+            f"Question: {question}"
+        )
 
     @backoff.on_exception(
         backoff.expo,
-        (RateLimitError, APIError, Timeout),
+        (OpenAIError),
         max_tries=3,
         jitter=backoff.full_jitter,
         on_backoff=lambda details: logger.warning(
@@ -70,7 +82,7 @@ class OpenAIClient:
                 content = chunk.choices[0].delta.content if chunk.choices[0].delta else ""
                 if content:
                     yield content
-        except (RateLimitError, APIError, Timeout) as e:
+        except (OpenAIError) as e:
             logger.error(f"❌ OpenAI error (stream_explanation): {type(e).__name__} - {e}")
             yield f"[OpenAI error: {type(e).__name__} - {e}]"
         except Exception as e:

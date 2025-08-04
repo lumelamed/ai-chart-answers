@@ -8,12 +8,12 @@ describe('ChartOrFallback', () => {
 
   it('muestra mensaje si no hay datos', () => {
     render(<ChartOrFallback columns={[]} rows={[]} chartType="bar" />);
-    expect(screen.getByText(/there is no data to display/i)).toBeInTheDocument();
+    expect(screen.getByText(/this question can't be visualized as a chart/i)).toBeInTheDocument();
   });
 
   it('muestra mensaje si no es graficable', () => {
     render(<ChartOrFallback columns={['A']} rows={[[1]]} chartType="bar" />);
-    expect(screen.getByText(/this result cannot be graphed/i)).toBeInTheDocument();
+    expect(screen.getByText(/this question can't be visualized as a chart/i)).toBeInTheDocument();
   });
 
   it('muestra tabla si chartType no es válido', () => {

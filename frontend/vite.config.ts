@@ -18,6 +18,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/ask': 'http://backend:8000',
+      '/explain': 'http://backend:8000',
       '/upload_csv': 'http://backend:8000',
     },
     watch: {
