@@ -1,6 +1,7 @@
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.webapi.middlewares.error_handling_middleware import ExceptionMiddleware
 from app.webapi.routes import router
 from app.webapi.config import DB_PATH
 import sqlite3
@@ -29,5 +30,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(ExceptionMiddleware)
 
 app.include_router(router)
