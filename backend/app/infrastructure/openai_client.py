@@ -43,3 +43,37 @@ class OpenAIClient:
             logger.error("❌ Unexpected error when calling OpenAI:")
             logger.error(traceback.format_exc())
             raise Exception("Unexpected failure when communicating with OpenAI") from e
+
+    @backoff.on_exception(
+        backoff.expo,
+        (RateLimitError, APIError, Timeout),
+        max_tries=3,
+        jitter=backoff.full_jitter,
+        on_backoff=lambda details: logger.warning(
+            f"Retrying OpenAI (stream_explanation, try {details['tries']}) due to: {details['exception']}"
+        )
+    )
+    async def stream_explanation(self, columns, rows):
+        import json
+        prompt = (
+            "Given the following SQL result, describe it in natural language for a business user. "
+            "Columns: " + json.dumps(columns) + ", Rows: " + json.dumps(rows) + ". "
+            "Be concise and clear."
+        )
+        try:
+            stream = await self.client.chat.completions.create(
+                model="gpt-4o",
+                messages=[{"role": "user", "content": prompt}],
+                stream=True,
+            )
+            async for chunk in stream:
+                content = chunk.choices[0].delta.content if chunk.choices[0].delta else ""
+                if content:
+                    yield content
+        except (RateLimitError, APIError, Timeout) as e:
+            logger.error(f"❌ OpenAI error (stream_explanation): {type(e).__name__} - {e}")
+            yield f"[OpenAI error: {type(e).__name__} - {e}]"
+        except Exception as e:
+            logger.error("❌ Unexpected error when calling OpenAI (stream_explanation):")
+            logger.error(traceback.format_exc())
+            yield f"[Unexpected error: {str(e)}]"

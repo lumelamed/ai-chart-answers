@@ -31,7 +31,7 @@ export default function ChartOrFallback({ columns, rows, chartType }: ChartOrFal
   if (!columns || !rows || columns.length === 0 || rows.length === 0) {
     return (
       <Alert variant="destructive" className="my-4">
-        <AlertTitle>No hay datos para mostrar.</AlertTitle>
+        <AlertTitle>There is no data to display.</AlertTitle>
       </Alert>
     );
   }
@@ -39,7 +39,7 @@ export default function ChartOrFallback({ columns, rows, chartType }: ChartOrFal
   if (!isGraphable(columns, rows)) {
     return (
       <Alert variant="destructive" className="my-4">
-        <AlertTitle>No se puede graficar este resultado.</AlertTitle>
+        <AlertTitle>This result cannot be graphed.</AlertTitle>
       </Alert>
     );
   }

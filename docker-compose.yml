@@ -2,10 +2,12 @@ services:
   backend:
     build: ./backend
     volumes:
+      - ./backend/app:/app/app
       - ./db:/app/db
     environment:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       MOCK_BACKEND: ${MOCK_BACKEND}
+      DB_PATH: ${DB_PATH}
     ports:
       - "8000:8000"
     depends_on: []
